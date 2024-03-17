@@ -1,0 +1,3 @@
+session = "zelix"
+
+terminal = [ "alacritty", "--command" ]

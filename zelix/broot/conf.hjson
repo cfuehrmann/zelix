@@ -1,0 +1,10 @@
+verbs: [
+    {
+        invocation: edit
+        shortcut: e
+        key: enter
+        apply_to: text_file
+        execution: "zx find ~/zelix {file}"
+        leave_broot: false
+    }
+]
