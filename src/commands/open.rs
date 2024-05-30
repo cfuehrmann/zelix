@@ -41,7 +41,7 @@ pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
 
     let zellij_args = ["--session", session, "--config-dir", config_dir];
 
-    match config.terminal.as_slice() {
+    match config.open.terminal.as_slice() {
         [] => run_zellij_and_wait(zellij_args),
         [terminal_command, terminal_args @ ..] => {
             spawn_zellij_in_terminal(terminal_command, terminal_args, zellij_args)

@@ -7,7 +7,7 @@ use std::{
 use clap::Parser;
 use tracing::{error, info};
 
-use crate::{init_tracing, ProjectDir};
+use crate::{get_config, init_tracing, HiddenMethod, ProjectDir};
 
 #[derive(Parser)]
 pub struct FindArgs {
@@ -34,7 +34,9 @@ pub fn find(
 
     let relative_path = get_relative_path(full_path_of_file, project_dir)?;
 
-    let helix_chars = if relative_path.starts_with('.') {
+    let helix_chars = if relative_path.starts_with('.')
+        && get_config(project_dir)?.find.hidden_method == HiddenMethod::Open
+    {
         format!(":o {}", relative_path)
     } else {
         format!(" f{}", relative_path)

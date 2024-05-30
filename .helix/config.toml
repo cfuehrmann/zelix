@@ -1,0 +1,4 @@
+[editor.file-picker]
+# So that Zelix can find hidden files without resetting the cursor to the
+# starting position
+hidden = false 

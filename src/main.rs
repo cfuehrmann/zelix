@@ -39,7 +39,27 @@ struct ProjectDir {
 #[serde(rename_all = "kebab-case")]
 struct Config {
     session: String,
+    open: OpenSection,
+    find: FindSection,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+struct OpenSection {
     terminal: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+struct FindSection {
+    hidden_method: HiddenMethod,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+enum HiddenMethod {
+    Open,
+    Picker,
 }
 
 fn main() -> ExitCode {
