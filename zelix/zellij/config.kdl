@@ -9,11 +9,5 @@ keybinds {
                 direction "Down"
             }
         }
-
-        bind "Alt t" {
-            WriteChars ":run-shell-command zx run-cargo-nextest ~/zelix ";
-            Write 18; // CTRL-r
-            WriteChars "%";
-        }
     }
 }

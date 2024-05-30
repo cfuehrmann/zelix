@@ -6,9 +6,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use commands::{
-    find, open, run_cargo_nextest, run_xunit, FindArgs, RunCargoNextestArgs, RunXunitArgs,
-};
+use commands::{find, open, FindArgs};
 use serde::Deserialize;
 use tracing::{error, level_filters::LevelFilter};
 use tracing_appender::non_blocking::WorkerGuard;
@@ -28,14 +26,6 @@ enum Command {
 
     /// Find a file in the project and show it in Helix
     Find(FindArgs),
-
-    /// Run the tests found in stdin in the project's zellij session, using
-    /// the xUnit test runner
-    RunXunit(RunXunitArgs),
-
-    /// Run the tests found in stdin in the project's zellij session, using
-    /// the xUnit test runner
-    RunCargoNextest(RunCargoNextestArgs),
 }
 
 #[derive(Parser)]
@@ -56,8 +46,6 @@ fn main() -> ExitCode {
     match &Cli::parse().command {
         Some(Command::Open(args)) => open(args),
         Some(Command::Find(args)) => find(args),
-        Some(Command::RunXunit(args)) => run_xunit(args),
-        Some(Command::RunCargoNextest(args)) => run_cargo_nextest(args),
         None => {
             eprintln!("No subcommand given.");
             Err(ExitCode::FAILURE)
@@ -112,15 +100,4 @@ fn get_config(project_dir: &str) -> Result<Config, ExitCode> {
         error!("Failed to parse the file '{}': {}", path.display(), e);
         ExitCode::FAILURE
     })
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn dummy_test_1() {
-        assert_eq!(1, 1);
-    }
-
-    #[test]
-    fn dummy_test_2() {}
 }

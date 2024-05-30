@@ -152,12 +152,3 @@ fn spawn_zellij_in_terminal(
             info!("Spawned process {} from command '{:?}'", pid, command);
         })
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn dummy_test_1() {}
-
-    #[test]
-    fn dummy_test_2() {}
-}
