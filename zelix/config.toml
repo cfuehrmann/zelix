@@ -1,9 +1,32 @@
 session = "zelix"
 
+# Configuration of zx open
 [open]
-terminal = [ "alacritty", "--command" ]
 
+# Open in the current terminal
+# terminal = [] 
+
+# New window with alacritty
+terminal = ["alacritty", "--command"]
+
+# New window with kitty
+# terminal = [ "kitty" ]
+
+# New window with foot. Very fast and low-memory. But no colored undercurls, 
+# so it's bad for LSP diagnostics.
+# terminal = [ "foot", "--" ]
+
+# New window with foot, in client-server mode
+# terminal = [ "footclient", "--" ]
+
+# New window with wezterm. Extremely feature-rich terminal, but for unknown
+# reason `wezterm start -- zellij ...` doesn't work for me. So the setting
+# below fails
+# terminal = [ "wezterm", "start", "--" ]
+
+# Configuration of zx find
 [find]
+
 # The options for "hidden-method" are "open" and "picker". 
 # For non-hidden files, Zelix uses Helix' picker (Space-f) to find the file.
 # Because, unlike Helix' ":open" command, going via the picker does not reset
