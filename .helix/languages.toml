@@ -13,7 +13,7 @@ block-comment-tokens = [
   { start = "/**", end = "*/" },
   { start = "/*!", end = "*/" },
 ]
-language-servers = [ "rust-analyzer", "gpt" ] # gpt is the only change
+language-servers = ["rust-analyzer", "gpt"] # gpt is the only change
 indent = { tab-width = 4, unit = "    " }
 persistent-diagnostic-sources = ["rustc", "clippy"]
 
@@ -25,5 +25,48 @@ check.command = "clippy"
 [[language]]
 name = "log"
 scope = "source.log"
-file-types = ["log", { glob = "zelix.log.*" } ]
+file-types = ["log", { glob = "zelix.log.*" }]
 
+[[language]]
+name = "markdown"
+scope = "source.md"
+injection-regex = "md|markdown"
+file-types = [
+  "md",
+  "markdown",
+  "mkd",
+  "mdwn",
+  "mdown",
+  "markdn",
+  "mdtxt",
+  "mdtext",
+  "workbook",
+  { glob = "PULLREQ_EDITMSG" },
+]
+roots = [".marksman.toml"]
+language-servers = ["markdown-oxide", "ltex-ls", "gpt"]
+indent = { tab-width = 2, unit = "  " }
+block-comment-tokens = { start = "<!--", end = "-->" }
+formatter = { command = 'prettier', args = [
+  "--parser",
+  "markdown",
+  "--prose-wrap",
+  "never",
+] }
+auto-format = true
+soft-wrap.enable = true
+soft-wrap.wrap-at-text-width = true
+
+[language-server.ltex-ls.config.ltex.dictionary]
+"en-US" = [
+  "Alacritty",
+  "difftastic",
+  "Difftastic",
+  "Zelix",
+  "Zellij",
+  "Broot",
+  "subcommand",
+  "subcommands",
+  "Subcommands",
+  "Neovim",
+]

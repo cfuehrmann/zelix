@@ -1,0 +1,23 @@
+keybinds {
+    unbind "Alt o" "Alt i" // Undbind in zellij, because needed for selections in Helix
+}
+
+layout {
+    tab name="Helix" focus=true {
+        pane split_direction="vertical" {
+            pane focus=true size="20%" command="broot" {
+                args "-g" "--conf" "zelix-config/broot/conf.hjson;../.config/broot/conf.hjson" // The second hjson is the assumed user-wide Broot config. Typically `..` is your home directory
+            } 
+            pane size="80%" command="hx" // The Helix command may differ on your machine. Change if necessary
+        }
+    }
+    tab name="Prompt" {
+        pane command="fish" { // Change this to your favorite shell
+        }
+    }
+    tab name="Diff" {
+        pane borderless=true command="git" {
+            args "diff"
+        }
+    }
+}

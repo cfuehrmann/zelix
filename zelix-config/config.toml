@@ -1,3 +1,4 @@
+# The Zellij session for your project. Rename this for your own projects.
 session = "zelix"
 
 # Configuration of zx open

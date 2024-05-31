@@ -75,7 +75,7 @@ fn main() -> ExitCode {
 }
 
 fn init_tracing(project_dir: &str) -> Result<(WorkerGuard, WorkerGuard), ExitCode> {
-    let dir = PathBuf::from(project_dir).join("zelix");
+    let dir = PathBuf::from(project_dir).join("zelix-config");
     let file_appender = tracing_appender::rolling::daily(dir, "zelix.log");
     let (non_blocking_file, file_guard) = tracing_appender::non_blocking(file_appender);
     let file_layer = fmt::layer().with_writer(non_blocking_file).with_ansi(false); // Disable ANSI colors for file logging
@@ -102,7 +102,9 @@ fn init_tracing(project_dir: &str) -> Result<(WorkerGuard, WorkerGuard), ExitCod
 }
 
 fn get_config(project_dir: &str) -> Result<Config, ExitCode> {
-    let path = PathBuf::from(project_dir).join("zelix").join("config.toml");
+    let path = PathBuf::from(project_dir)
+        .join("zelix-config")
+        .join("config.toml");
 
     let mut file = File::open(&path).map_err(|e| {
         error!("Failed to open the file '{}': {}", path.display(), e);

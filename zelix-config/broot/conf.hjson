@@ -1,0 +1,12 @@
+# For the content of this file, see the Broot documentation
+
+verbs: [
+    {
+        invocation: edit
+        shortcut: e
+        key: enter
+        apply_to: text_file
+        execution: "zx find ~/zelix {file}" # Change ~/zelix into something else if needed
+        leave_broot: false
+    }
+]

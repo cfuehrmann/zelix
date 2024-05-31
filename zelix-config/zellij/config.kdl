@@ -1,0 +1,11 @@
+// For the content of this file, see the Zellij documentation
+
+keybinds {
+    normal {
+        bind "Ctrl b" {
+            Run "cargo" "build" "--release" {
+                direction "Down"
+            }
+        }
+    }
+}

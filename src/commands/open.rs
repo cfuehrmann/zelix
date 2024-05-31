@@ -26,7 +26,7 @@ pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
 
     delete_session(session)?;
 
-    let config_dir = PathBuf::from("zelix").join("zellij");
+    let config_dir = PathBuf::from("zelix-config").join("zellij");
 
     let config_dir = config_dir.to_str().map_or_else(
         || {
