@@ -1,7 +1,7 @@
 # The Zellij session for your project. Rename this for your own projects.
 session = "zelix"
 
-# Configuration of zx open
+# Configuration of the open subcommand
 [open]
 
 # Open in the current terminal
@@ -25,7 +25,7 @@ terminal = ["alacritty", "--command"]
 # below fails
 # terminal = [ "wezterm", "start", "--" ]
 
-# Configuration of zx find
+# Configuration of the find subcommand
 [find]
 
 # The options for "hidden-method" are "open" and "picker". 
