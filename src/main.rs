@@ -1,13 +1,14 @@
 mod commands;
 
-use std::fs::File;
 use std::io::Read;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
+use std::{env, fs::File};
 
 use clap::{Parser, Subcommand};
 use commands::{find, open, FindArgs};
 use serde::Deserialize;
+use tracing::info;
 use tracing::{error, level_filters::LevelFilter};
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Layer};
@@ -75,7 +76,7 @@ fn main() -> ExitCode {
 }
 
 fn init_tracing(project_dir: &str) -> Result<(WorkerGuard, WorkerGuard), ExitCode> {
-    let dir = PathBuf::from(project_dir).join("zelix-config");
+    let dir = PathBuf::from(project_dir);
     let file_appender = tracing_appender::rolling::daily(dir, "zelix.log");
     let (non_blocking_file, file_guard) = tracing_appender::non_blocking(file_appender);
     let file_layer = fmt::layer().with_writer(non_blocking_file).with_ansi(false); // Disable ANSI colors for file logging
@@ -105,6 +106,31 @@ fn get_config(project_dir: &str) -> Result<Config, ExitCode> {
     let path = PathBuf::from(project_dir)
         .join("zelix-config")
         .join("config.toml");
+
+    let path = if Path::new(&path).exists() {
+        info!("File exists: {:?}", path);
+        path
+    } else {
+        info!("File does not exist: {:?}", path);
+
+        let home = env::var("HOME").map_err(|e| {
+            error!("Failed to read $HOME: {}", e);
+            ExitCode::FAILURE
+        })?;
+
+        let path = PathBuf::from(home)
+            .join(".config")
+            .join("zelix")
+            .join("config.toml");
+
+        if Path::new(&path).exists() {
+            info!("File exists: {:?}", path);
+            path
+        } else {
+            error!("File does not exist: {:?}", path);
+            return Err(ExitCode::FAILURE);
+        }
+    };
 
     let mut file = File::open(&path).map_err(|e| {
         error!("Failed to open the file '{}': {}", path.display(), e);

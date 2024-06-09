@@ -1,6 +1,6 @@
 use std::{
     env,
-    path::PathBuf,
+    path::{Path, PathBuf},
     process::{Command, ExitCode},
 };
 
@@ -26,20 +26,9 @@ pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
 
     delete_session(session)?;
 
-    let config_dir = PathBuf::from("zelix-config").join("zellij");
+    let zellij_config_dir = get_zellij_config_dir(project_dir)?;
 
-    let config_dir = config_dir.to_str().map_or_else(
-        || {
-            error!(
-                "Failed to convert path to a string: {}",
-                config_dir.display()
-            );
-            Err(ExitCode::FAILURE)
-        },
-        Ok,
-    )?;
-
-    let zellij_args = ["--session", session, "--config-dir", config_dir];
+    let zellij_args = ["--session", session, "--config-dir", &zellij_config_dir];
 
     match config.open.terminal.as_slice() {
         [] => run_zellij_and_wait(zellij_args),
@@ -95,6 +84,48 @@ fn delete_session(session: &str) -> Result<(), ExitCode> {
             Err(ExitCode::FAILURE)
         }
     }
+}
+
+fn get_zellij_config_dir(project_dir: &str) -> Result<String, ExitCode> {
+    info!("Reading zellij config directory");
+    let dir = PathBuf::from(project_dir)
+        .join("zelix-config")
+        .join("zellij");
+
+    let dir = if Path::new(&dir).exists() {
+        info!("Directory exists: {:?}", dir);
+        dir
+    } else {
+        info!("Directory does not exist: {:?}", dir);
+
+        let home = env::var("HOME").map_err(|e| {
+            error!("Failed to read $HOME: {}", e);
+            ExitCode::FAILURE
+        })?;
+
+        let dir = PathBuf::from(home)
+            .join(".config")
+            .join("zelix")
+            .join("zellij");
+
+        if Path::new(&dir).exists() {
+            info!("Directory exists: {:?}", dir);
+            dir
+        } else {
+            error!("Directory does not exist: {:?}", dir);
+            return Err(ExitCode::FAILURE);
+        }
+    };
+
+    let dir = dir
+        .to_str()
+        .ok_or_else(|| {
+            error!("Failed to convert path to a string: {}", dir.display());
+            ExitCode::FAILURE
+        })?
+        .to_owned();
+
+    Ok(dir)
 }
 
 fn run_zellij_and_wait(zellij_args: [&str; 4]) -> Result<(), ExitCode> {

@@ -56,7 +56,7 @@ This may require some adjustments:
 - Difftastic (optional): The third tab runs `git diff`. For better output, install difftastic and configure Git to use it.
 - Themes (optional): Harmonize your Broot and Helix themes for a consistent look.
 
-> Note: Zelix writes logs to files named `zelix.log.yyyy-mm-dd` in the `zelix-config` directory. Check these files if you encounter issues.
+> Note: Zelix writes logs to files named `zelix.log.yyyy-mm-dd` in the project directory. Check these files if you encounter issues.
 
 Once Zelix opens successfully, try the file tree: Navigate to some file, with Tab or Shift+Tab, or by entering some characters to fuzzy-find a file. Then press enter to open the file in Helix. If this does not work, please check the logs.
 
@@ -71,3 +71,14 @@ Finally, while in the Helix pane, build Zelix with the shortcut Ctrl+b as define
 ## Adapting Zelix for your projects
 
 When you are satisfied with the Zelix project setup, use it as a template for your own projects. Copy the `zelix-config` folder to your project and adjust the configuration files as needed.
+
+## Configuration
+
+Zelix searches for configuration files in the following order:
+
+- `<PROJECT_DIR>/zelix-config`
+- `$HOME/.config/zelix/`
+
+This search pattern applies individually to both the `config.toml` file and the `zellij` subfolder. For instance, you can have `config.toml` in `$HOME/.config/zelix/` while maintaining your Zellij configuration in `<PROJECT_DIR>/zelix/`, or the other way around.
+
+Note: Zellij does not support environment variables or the `~` symbol for home directory references. Therefore, when specifying paths in a Zellij layout file, avoid using `$HOME` or `~` for Broot configuration files or any other paths.
