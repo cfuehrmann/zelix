@@ -79,6 +79,10 @@ Zelix searches for configuration files in the following order:
 - `<PROJECT_DIR>/zelix-config`
 - `$HOME/.config/zelix/`
 
-This search pattern applies individually to both the `config.toml` file and the `zellij` subfolder. For instance, you can have `config.toml` in `$HOME/.config/zelix/` while maintaining your Zellij configuration in `<PROJECT_DIR>/zelix/`, or the other way around.
+This search pattern applies individually to both the `config.toml` file and the `zellij` subfolder.
+
+If there is a `<PROJECT_DIR>/zelix-config/zellij/` folder, it completely replaces the `$HOME/.config/zelix/zellij/` folder if the latter exists.
+
+If there is a `<PROJECT_DIR>/zelix-config/config.toml`, its settings override those in `$HOME/.config/zelix/config.toml`, while inheriting all other settings from the latter.
 
 Note: Zellij does not support environment variables or the `~` symbol for home directory references. Therefore, when specifying paths in a Zellij layout file, avoid using `$HOME` or `~` for Broot configuration files or any other paths.

@@ -3,7 +3,7 @@
 keybinds {
     normal {
         bind "Ctrl b" {
-            Run "cargo" "build" "--release" {
+            Run "cargo" "build" {
                 direction "Down"
             }
         }

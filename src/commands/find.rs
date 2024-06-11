@@ -7,7 +7,10 @@ use std::{
 use clap::Parser;
 use tracing::{error, info};
 
-use crate::{get_config, init_tracing, HiddenMethod, ProjectDir};
+use crate::{
+    config::{Config, HiddenMethod},
+    init_tracing, ProjectDir,
+};
 
 #[derive(Parser)]
 pub struct FindArgs {
@@ -34,11 +37,25 @@ pub fn find(
 
     let relative_path = get_relative_path(full_path_of_file, project_dir)?;
 
-    let helix_chars = if relative_path.starts_with('.')
-        && get_config(project_dir)?.find.hidden_method == HiddenMethod::Open
-    {
-        format!(":o {}", relative_path)
+    let helix_chars = if relative_path.starts_with('.') {
+        // Here we have a hidden file
+        let method = Config::load(project_dir)?.find.hidden_method;
+        info!("The configured method for hidden files is {:?}", method);
+
+        if method != Some(HiddenMethod::Picker) {
+            // If method is None, then `find.hidden_method` is not set in the
+            // configuration files. In that case, we use ":o", because that way
+            // the file selected by the user is guaranteed to be found.
+            format!(":o {}", relative_path)
+        } else {
+            // We only use " f" if the method is Picker. This only makes sense
+            // when Helix is configured to show hidden files on " f".
+            format!(" f{}", relative_path)
+        }
     } else {
+        // Here we have a non-hidden file. They are guaranteed to be found by
+        // " f". So " f" is better than ": o", because " f" preserves the cursor
+        // position.
         format!(" f{}", relative_path)
     };
 

@@ -6,15 +6,21 @@ use std::{
 
 use tracing::{error, info};
 
-use crate::{get_config, init_tracing, ProjectDir};
+use crate::{config::Config, init_tracing, ProjectDir};
 
 pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
     let _guards = init_tracing(project_dir)?;
 
-    info!("Project dir is {}", project_dir,);
+    info!("Project dir is {}", project_dir);
 
-    let config = get_config(project_dir)?;
-    let session = &config.session;
+    let config = Config::load(project_dir)?;
+
+    let session = config.session.ok_or_else(|| {
+        error!("No session is specified in the configuration file!");
+        ExitCode::FAILURE
+    })?;
+
+    info!("Session is '{}'", session);
 
     env::set_current_dir(project_dir).map_err(|e| {
         error!(
@@ -24,13 +30,16 @@ pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
         ExitCode::FAILURE
     })?;
 
-    delete_session(session)?;
+    delete_session(&session)?;
 
     let zellij_config_dir = get_zellij_config_dir(project_dir)?;
+    let zellij_args = ["--session", &session, "--config-dir", &zellij_config_dir];
+    let terminal = config.open.terminal;
+    info!("Terminal is {:?}", terminal);
 
-    let zellij_args = ["--session", session, "--config-dir", &zellij_config_dir];
-
-    match config.open.terminal.as_slice() {
+    // If `open.terminal` is not set in the configuration files, it is unwrapped
+    // to the default []. So the first match arm will be used.
+    match terminal.unwrap_or_default().as_slice() {
         [] => run_zellij_and_wait(zellij_args),
         [terminal_command, terminal_args @ ..] => {
             spawn_zellij_in_terminal(terminal_command, terminal_args, zellij_args)

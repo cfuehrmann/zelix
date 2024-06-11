@@ -1,15 +1,12 @@
 mod commands;
+mod config;
 
-use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitCode;
-use std::{env, fs::File};
 
 use clap::{Parser, Subcommand};
 use commands::{find, open, FindArgs};
-use serde::Deserialize;
-use tracing::info;
-use tracing::{error, level_filters::LevelFilter};
+use tracing::level_filters::LevelFilter;
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
@@ -34,33 +31,6 @@ struct ProjectDir {
     /// The project directory
     #[clap(value_parser)]
     project_dir: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-struct Config {
-    session: String,
-    open: OpenSection,
-    find: FindSection,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-struct OpenSection {
-    terminal: Vec<String>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-struct FindSection {
-    hidden_method: HiddenMethod,
-}
-
-#[derive(Debug, Deserialize, PartialEq)]
-#[serde(rename_all = "kebab-case")]
-enum HiddenMethod {
-    Open,
-    Picker,
 }
 
 fn main() -> ExitCode {
@@ -100,52 +70,4 @@ fn init_tracing(project_dir: &str) -> Result<(WorkerGuard, WorkerGuard), ExitCod
         })?;
 
     Ok((file_guard, stderr_guard)) // Tracing flushes when the caller drops the guards
-}
-
-fn get_config(project_dir: &str) -> Result<Config, ExitCode> {
-    let path = PathBuf::from(project_dir)
-        .join("zelix-config")
-        .join("config.toml");
-
-    let path = if Path::new(&path).exists() {
-        info!("File exists: {:?}", path);
-        path
-    } else {
-        info!("File does not exist: {:?}", path);
-
-        let home = env::var("HOME").map_err(|e| {
-            error!("Failed to read $HOME: {}", e);
-            ExitCode::FAILURE
-        })?;
-
-        let path = PathBuf::from(home)
-            .join(".config")
-            .join("zelix")
-            .join("config.toml");
-
-        if Path::new(&path).exists() {
-            info!("File exists: {:?}", path);
-            path
-        } else {
-            error!("File does not exist: {:?}", path);
-            return Err(ExitCode::FAILURE);
-        }
-    };
-
-    let mut file = File::open(&path).map_err(|e| {
-        error!("Failed to open the file '{}': {}", path.display(), e);
-        ExitCode::FAILURE
-    })?;
-
-    let mut buf = String::new();
-
-    file.read_to_string(&mut buf).map_err(|e| {
-        error!("Failed to read the file '{}': {}", path.display(), e);
-        ExitCode::FAILURE
-    })?;
-
-    toml::from_str(&buf).map_err(|e| {
-        error!("Failed to parse the file '{}': {}", path.display(), e);
-        ExitCode::FAILURE
-    })
 }

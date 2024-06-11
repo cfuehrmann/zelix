@@ -8,7 +8,7 @@ session = "zelix"
 # terminal = [] 
 
 # New window with alacritty
-terminal = ["alacritty", "--command"]
+# terminal = ["alacritty", "--command"]
 
 # New window with kitty
 # terminal = [ "kitty" ]
