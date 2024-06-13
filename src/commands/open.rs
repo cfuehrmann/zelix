@@ -1,5 +1,5 @@
 use std::{
-    env,
+    env, fs,
     path::{Path, PathBuf},
     process::{Command, ExitCode},
 };
@@ -22,6 +22,13 @@ pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
 
     info!("Session is '{}'", session);
 
+    delete_session(&session)?;
+
+    let zellij_config_dir = get_zellij_config_dir(project_dir)?;
+    let zellij_args = ["--session", &session, "--config-dir", &zellij_config_dir];
+    let terminal = config.open.terminal;
+    info!("Terminal is {:?}", terminal);
+
     env::set_current_dir(project_dir).map_err(|e| {
         error!(
             "Failed to set the current directory to '{}': {}",
@@ -29,13 +36,6 @@ pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
         );
         ExitCode::FAILURE
     })?;
-
-    delete_session(&session)?;
-
-    let zellij_config_dir = get_zellij_config_dir(project_dir)?;
-    let zellij_args = ["--session", &session, "--config-dir", &zellij_config_dir];
-    let terminal = config.open.terminal;
-    info!("Terminal is {:?}", terminal);
 
     // If `open.terminal` is not set in the configuration files, it is unwrapped
     // to the default []. So the first match arm will be used.
@@ -96,12 +96,16 @@ fn delete_session(session: &str) -> Result<(), ExitCode> {
 }
 
 fn get_zellij_config_dir(project_dir: &str) -> Result<String, ExitCode> {
-    info!("Reading zellij config directory");
     let dir = PathBuf::from(project_dir)
         .join("zelix-config")
         .join("zellij");
 
-    let dir = if Path::new(&dir).exists() {
+    let exists = Path::new(&dir).try_exists().map_err(|e| {
+        error!("Failed to check if directory '{:?}' exists: {}", dir, e);
+        ExitCode::FAILURE
+    })?;
+
+    let dir = if exists {
         info!("Directory exists: {:?}", dir);
         dir
     } else {
@@ -117,7 +121,12 @@ fn get_zellij_config_dir(project_dir: &str) -> Result<String, ExitCode> {
             .join("zelix")
             .join("zellij");
 
-        if Path::new(&dir).exists() {
+        let exist = Path::new(&dir).try_exists().map_err(|e| {
+            error!("Failed to check if directory '{:?}' exists: {}", dir, e);
+            ExitCode::FAILURE
+        })?;
+
+        if exist {
             info!("Directory exists: {:?}", dir);
             dir
         } else {
@@ -126,10 +135,14 @@ fn get_zellij_config_dir(project_dir: &str) -> Result<String, ExitCode> {
         }
     };
 
-    let dir = dir
+    let dir = fs::canonicalize(&dir)
+        .map_err(|e| {
+            error!("Failed to canonicalize the directory '{:?}': {}", dir, e);
+            ExitCode::FAILURE
+        })?
         .to_str()
         .ok_or_else(|| {
-            error!("Failed to convert path to a string: {}", dir.display());
+            error!("Failed to convert path to a string: {:?}", dir);
             ExitCode::FAILURE
         })?
         .to_owned();

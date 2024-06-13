@@ -70,18 +70,16 @@ fn get_relative_path<'a>(
 
     let relative_path = path.strip_prefix(project_dir).map_err(|e| {
         error!(
-            "Failed to strip the prefix '{}' from the path '{}': {}",
-            project_dir,
-            path.display(),
-            e
+            "Failed to strip the prefix '{}' from the path '{:?}': {}",
+            project_dir, path, e
         );
         ExitCode::FAILURE
     })?;
 
     relative_path.to_str().ok_or_else(|| {
         error!(
-            "Failed to convert the path '{}' to a string!",
-            relative_path.display()
+            "Failed to convert the path '{:?}' to a string!",
+            relative_path
         );
         ExitCode::FAILURE
     })

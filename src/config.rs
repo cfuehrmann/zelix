@@ -66,18 +66,17 @@ impl Config {
         fs::read_to_string(path).map_or_else(
             |e| {
                 info!(
-                    "File does not exist or could not be read '{}': {}",
-                    path.display(),
-                    e
+                    "File does not exist or could not be read '{:?}': {}",
+                    path, e
                 );
                 Ok(Config::default())
             },
             |content| {
                 let config = toml::from_str(&content).map_err(|e| {
-                    error!("Failed to parse the file '{}': {}", path.display(), e);
+                    error!("Failed to parse the file '{:?}': {}", path, e);
                     ExitCode::FAILURE
                 })?;
-                info!("Configuration loaded from '{}'", path.display());
+                info!("Configuration loaded from '{:?}'", path);
                 Ok(config)
             },
         )
