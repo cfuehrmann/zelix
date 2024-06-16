@@ -1,5 +1,13 @@
 keybinds {
     unbind "Alt o" "Alt i" // Undbind in zellij, because needed for selections in Helix
+
+    normal {
+        bind "Ctrl b" {
+            Run "cargo" "build" {
+                direction "Down"
+            }
+        }
+    }
 }
 
 layout {
