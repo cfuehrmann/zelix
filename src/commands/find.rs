@@ -5,7 +5,7 @@ use std::{
 };
 
 use clap::Parser;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use crate::{
     config::{Config, HiddenMethod},
@@ -37,26 +37,40 @@ pub fn find(
 
     let relative_path = get_relative_path(full_path_of_file, project_dir)?;
 
-    let helix_chars = if relative_path.starts_with('.') {
-        // Here we have a hidden file
-        let method = Config::load(project_dir)?.find.hidden_method;
-        info!("The configured method for hidden files is {:?}", method);
+    let helix_chars = match is_hidden(full_path_of_file) {
+        Some(true) => {
+            let method = Config::load(project_dir)?.find.hidden_method;
 
-        if method != Some(HiddenMethod::Picker) {
-            // If method is None, then `find.hidden_method` is not set in the
-            // configuration files. In that case, we use ":o", because that way
-            // the file selected by the user is guaranteed to be found.
-            format!(":o {}", relative_path)
-        } else {
-            // We only use " f" if the method is Picker. This only makes sense
-            // when Helix is configured to show hidden files on " f".
+            info!(
+                "The file is hidden. The configured method for hidden files is {:?}",
+                method
+            );
+
+            if method != Some(HiddenMethod::Picker) {
+                // If method is None, then `find.hidden_method` is not set in the
+                // configuration files. In that case, we use ":o", because that way
+                // the file selected by the user is guaranteed to be found.
+                format!(":o {}", relative_path)
+            } else {
+                // We only use " f" if the method is Picker. This only makes sense
+                // when Helix is configured to show hidden files on " f".
+                format!(" f{}", relative_path)
+            }
+        }
+        Some(false) => {
+            info!("The file is not hidden.");
+
+            // Non-hidden files are found by " f". So " f" is better than
+            // ": o", because " f" preserves the cursor position.
             format!(" f{}", relative_path)
         }
-    } else {
-        // Here we have a non-hidden file. They are guaranteed to be found by
-        // " f". So " f" is better than ": o", because " f" preserves the cursor
-        // position.
-        format!(" f{}", relative_path)
+        None => {
+            warn!("It is unknown if the file is hidden.");
+
+            // In this case we use ": o", because it seem to be the most
+            // reliable way to find the file.
+            format!(":o {}", relative_path)
+        }
     };
 
     write_chars_to_helix(helix_chars)
@@ -83,6 +97,13 @@ fn get_relative_path<'a>(
         );
         ExitCode::FAILURE
     })
+}
+
+fn is_hidden(file_path: &str) -> Option<bool> {
+    Path::new(file_path)
+        .file_name()
+        .and_then(|file_name| file_name.to_str())
+        .map(|file_name_str| file_name_str.starts_with('.'))
 }
 
 fn write_chars_to_helix(chars: String) -> Result<(), ExitCode> {
