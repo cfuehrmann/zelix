@@ -2,11 +2,15 @@
 
 verbs: [
     {
-        invocation: edit
-        shortcut: e
         key: enter
         apply_to: text_file
-        execution: "zelix find ~/zelix {file}" # Change ~/zelix into something else if needed
+        execution: "zelix find-in-helix ~/zelix {file}" # Change ~/zelix into something else if needed
+        leave_broot: false
+    },
+    {
+        shortcut: o
+        apply_to: text_file
+        execution: "zelix open-in-helix ~/zelix {file}" # Change ~/zelix into something else if needed
         leave_broot: false
     }
 ]

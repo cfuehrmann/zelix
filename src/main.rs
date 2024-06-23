@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use commands::{find, open, FindArgs};
+use commands::{find, find_in_helix, open, open_in_helix, FindInHelixArgs, OpenInHelixArgs};
 use tracing::level_filters::LevelFilter;
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Layer};
@@ -19,11 +19,17 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Open a project
+    /// Open a Zelix project
     Open(ProjectDir),
 
-    /// Find a file in the project and show it in Helix
-    Find(FindArgs),
+    /// Use Helix' file picker (Space f) on a file
+    FindInHelix(FindInHelixArgs),
+
+    /// Legacy name for the find-in-helix command
+    Find(FindInHelixArgs),
+
+    /// Use Helix' open command (:open) on a file
+    OpenInHelix(OpenInHelixArgs),
 }
 
 #[derive(Parser)]
@@ -36,7 +42,9 @@ struct ProjectDir {
 fn main() -> ExitCode {
     match &Cli::parse().command {
         Some(Command::Open(args)) => open(args),
+        Some(Command::FindInHelix(args)) => find_in_helix(args),
         Some(Command::Find(args)) => find(args),
+        Some(Command::OpenInHelix(args)) => open_in_helix(args),
         None => {
             eprintln!("No subcommand given.");
             Err(ExitCode::FAILURE)

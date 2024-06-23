@@ -24,16 +24,3 @@ session = "zelix"
 # reason `wezterm start -- zellij ...` doesn't work for me. So the setting
 # below fails
 # terminal = [ "wezterm", "start", "--" ]
-
-# Configuration of the find subcommand
-[find]
-
-# The options for "hidden-method" are "open" and "picker". 
-# For non-hidden files, Zelix uses Helix' picker (Space-f) to find the file.
-# Because, unlike Helix' ":open" command, going via the picker does not reset
-# the cursor to the start of the found file. But the picker finds _hidden_ 
-# files only if that is explicitly configured in Helix. If you don't want Helix'
-# picker to show hidden files, you should choose "open" here. Then Zelix will
-# find hidden files with ":open", at the cost of resetting the cursor to the
-# start of the found file.
-hidden-method = "picker"

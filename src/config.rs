@@ -13,26 +13,12 @@ use tracing::{error, info};
 pub struct Config {
     pub session: Option<String>,
     pub open: OpenSection,
-    pub find: FindSection,
 }
 
 #[derive(Debug, Deserialize, Merge, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct OpenSection {
     pub terminal: Option<Vec<String>>,
-}
-
-#[derive(Debug, Deserialize, Merge, Default)]
-#[serde(rename_all = "kebab-case")]
-pub struct FindSection {
-    pub hidden_method: Option<HiddenMethod>,
-}
-
-#[derive(Debug, Deserialize, PartialEq)]
-#[serde(rename_all = "kebab-case")]
-pub enum HiddenMethod {
-    Open,
-    Picker,
 }
 
 impl Config {

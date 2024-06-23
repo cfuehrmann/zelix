@@ -27,7 +27,7 @@ Ensure that the following tools are installed on your system:
 
 ## Installation
 
-With Zelix being new and needing feedback from early adopters, I recommend to clone Zelix and install it locally with Cargo:
+To get started, simply clone the Zelix repository and install it locally using Cargo. This is the only installation method available right now:
 
 ```sh
 https://github.com/cfuehrmann/zelix.git
@@ -48,9 +48,9 @@ zelix open ~/zelix # Replace '~/zelix' with the correct path on your system
 This may require some adjustments:
 
 - Helix: The file `zelix-config/zellij/layouts/default.kdl` assumes that the Helix command is `hx`. If the command differs on your system, change it in that file.
-- Terminal emulator: You can configure in `zelix-config/config.toml` which terminal emulator to use. The current choice is Alacritty. Change it if you prefer another terminal emulator.
+- Terminal emulator configuration: Zelix can open projects in the existing terminal emulator window or in a new window with a configurable terminal emulator. This behavior is configured in the `zelix-config/config.toml` file.
 - Broot: The Zelix project uses Broot as the file tree. (While Zelix can use any file tree in other projects.)
-  - The `find` subcommand in `zelix-config/broot/conf.hjson` assumes that the Zelix project resides in `~/zelix`. Change that if necessary.
+  - The `find-in-helix` subcommand in `zelix-config/broot/conf.hjson` assumes that the Zelix project resides in `~/zelix`. Change that if necessary.
   - The file `zelix-config/layouts/default.kdl` assumes that you have a user-wide Broot config `../.config/broot/conf.hjson` (typically `..` is your home directory). Change that path if it differs on your system. Note that, due to a Zellij restriction, the tilde `~` and the environment variable `$HOME` cannot be used in that path.
 - Shell: The second tab in `zelix-config/zellij/layouts/default.kdl` uses the Fish shell. Change it if you prefer a different shell.
 - Difftastic (optional): The third tab runs `git diff`. For better output, install difftastic and configure Git to use it.
@@ -58,7 +58,11 @@ This may require some adjustments:
 
 > Note: Zelix writes logs to files named `zelix.log.yyyy-mm-dd` in the project directory. Check these files if you encounter issues.
 
-Once Zelix opens successfully, try the file tree: Navigate to some file, with Tab or Shift+Tab, or by entering some characters to fuzzy-find a file. Then press enter to open the file in Helix. If this does not work, please check the logs.
+Once Zelix opens successfully, try the file tree: Navigate to some file, with Tab or Shift+Tab, or by entering some characters to fuzzy-find a file. Then press Enter to open the file in Helix.
+
+> If pressing 'Enter' does not open the file, it could be due to the file being visible in Broot but not in Helix's file picker. This situation may arise if the file is hidden or ignored for various reasons. In such cases, use the "Space o" shortcut in Broot. That shortcut utilizes Helix's `:open` function, which can access hidden and ignored files. However, it positions the cursor at the beginning of the file.
+
+If opening the file fails, please check the logs.
 
 Then use Zellij shortcuts Alt+h and Alt+l to switch between tabs:
 
