@@ -5,10 +5,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use commands::{find, find_in_helix, open, open_in_helix, FindInHelixArgs, OpenInHelixArgs};
+use commands::{FindInHelixArgs, OpenInHelixArgs, find, find_in_helix, open, open_in_helix};
 use tracing::level_filters::LevelFilter;
 use tracing_appender::non_blocking::WorkerGuard;
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Layer};
+use tracing_subscriber::{Layer, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]

@@ -6,7 +6,7 @@ use std::{
 
 use tracing::{error, info};
 
-use crate::{config::Config, init_tracing, ProjectDir};
+use crate::{ProjectDir, config::Config, init_tracing};
 
 pub fn open(ProjectDir { project_dir }: &ProjectDir) -> Result<(), ExitCode> {
     let _guards = init_tracing(project_dir)?;
